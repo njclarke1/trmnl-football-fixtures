@@ -1,0 +1,16 @@
+# Secrets & local config
+.env
+HANDOFF.md
+
+# Runtime cache (crests are trademarked assets — never commit)
+cache/
+app/cache/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Saved raw upstream responses used for local verification
+tests/fixtures/real_*

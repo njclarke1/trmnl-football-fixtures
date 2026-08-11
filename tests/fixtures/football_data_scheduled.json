@@ -1,0 +1,80 @@
+{
+  "filters": {
+    "status": "SCHEDULED",
+    "limit": 6,
+    "permission": "TIER_ONE"
+  },
+  "resultSet": {
+    "count": 5,
+    "competitions": "PL",
+    "first": "2026-08-23",
+    "last": "2026-09-26"
+  },
+  "matches": [
+    {
+      "id": 500001,
+      "utcDate": "2026-08-23T15:30:00Z",
+      "status": "SCHEDULED",
+      "matchday": 2,
+      "stage": "REGULAR_SEASON",
+      "venue": "St James' Park",
+      "competition": { "id": 2021, "name": "Premier League", "code": "PL" },
+      "area": { "id": 2072, "name": "England", "code": "ENG" },
+      "homeTeam": { "id": 67, "name": "Newcastle United FC", "shortName": "Newcastle United", "tla": "NEW", "crest": "https://crests.football-data.org/67.png" },
+      "awayTeam": { "id": 64, "name": "Liverpool FC", "shortName": "Liverpool", "tla": "LIV", "crest": "https://crests.football-data.org/64.png" },
+      "score": { "fullTime": { "home": null, "away": null } }
+    },
+    {
+      "id": 500002,
+      "utcDate": "2026-08-29T11:30:00Z",
+      "status": "SCHEDULED",
+      "matchday": 3,
+      "stage": "REGULAR_SEASON",
+      "venue": "Anfield",
+      "competition": { "id": 2021, "name": "Premier League", "code": "PL" },
+      "area": { "id": 2072, "name": "England", "code": "ENG" },
+      "homeTeam": { "id": 64, "name": "Liverpool FC", "shortName": "Liverpool", "tla": "LIV", "crest": "https://crests.football-data.org/64.png" },
+      "awayTeam": { "id": 65, "name": "Nottingham Forest FC", "shortName": "Nottingham Forest", "tla": "NOT", "crest": "https://crests.football-data.org/65.png" },
+      "score": { "fullTime": { "home": null, "away": null } }
+    },
+    {
+      "id": 500003,
+      "utcDate": "2026-09-04T19:00:00Z",
+      "status": "SCHEDULED",
+      "matchday": 4,
+      "stage": "REGULAR_SEASON",
+      "venue": "Portman Road",
+      "competition": { "id": 2021, "name": "Premier League", "code": "PL" },
+      "area": { "id": 2072, "name": "England", "code": "ENG" },
+      "homeTeam": { "id": 349, "name": "Ipswich Town FC", "shortName": "Ipswich Town", "tla": "IPS", "crest": "https://crests.football-data.org/349.png" },
+      "awayTeam": { "id": 64, "name": "Liverpool FC", "shortName": "Liverpool", "tla": "LIV", "crest": "https://crests.football-data.org/64.png" },
+      "score": { "fullTime": { "home": null, "away": null } }
+    },
+    {
+      "id": 500004,
+      "utcDate": "2026-09-20T13:00:00Z",
+      "status": "SCHEDULED",
+      "matchday": 5,
+      "stage": "REGULAR_SEASON",
+      "venue": "Vitality Stadium",
+      "competition": { "id": 2021, "name": "Premier League", "code": "PL" },
+      "area": { "id": 2072, "name": "England", "code": "ENG" },
+      "homeTeam": { "id": 1044, "name": "AFC Bournemouth", "shortName": "Bournemouth", "tla": "BOU", "crest": "https://crests.football-data.org/1044.png" },
+      "awayTeam": { "id": 64, "name": "Liverpool FC", "shortName": "Liverpool", "tla": "LIV", "crest": "https://crests.football-data.org/64.png" },
+      "score": { "fullTime": { "home": null, "away": null } }
+    },
+    {
+      "id": 500005,
+      "utcDate": "2026-09-26T14:00:00Z",
+      "status": "SCHEDULED",
+      "matchday": 6,
+      "stage": "REGULAR_SEASON",
+      "venue": "Anfield",
+      "competition": { "id": 2021, "name": "Premier League", "code": "PL" },
+      "area": { "id": 2072, "name": "England", "code": "ENG" },
+      "homeTeam": { "id": 64, "name": "Liverpool FC", "shortName": "Liverpool", "tla": "LIV", "crest": "https://crests.football-data.org/64.png" },
+      "awayTeam": { "id": 62, "name": "Everton FC", "shortName": "Everton", "tla": "EVE", "crest": "https://crests.football-data.org/62.png" },
+      "score": { "fullTime": { "home": null, "away": null } }
+    }
+  ]
+}

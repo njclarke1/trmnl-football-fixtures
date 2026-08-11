@@ -1,0 +1,98 @@
+{
+  "get": "fixtures",
+  "parameters": { "team": "40", "next": "6" },
+  "errors": [],
+  "results": 6,
+  "response": [
+    {
+      "fixture": {
+        "id": 1400001,
+        "date": "2026-08-16T11:00:00+00:00",
+        "timestamp": 1786964400,
+        "venue": { "id": 550, "name": "Anfield", "city": "Liverpool" },
+        "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      },
+      "league": { "id": 667, "name": "Club Friendlies", "country": "World", "season": 2026, "round": "Club Friendlies 1" },
+      "teams": {
+        "home": { "id": 40, "name": "Liverpool", "winner": null },
+        "away": { "id": 895, "name": "Como", "winner": null }
+      },
+      "goals": { "home": null, "away": null }
+    },
+    {
+      "fixture": {
+        "id": 1400002,
+        "date": "2026-08-23T15:30:00+00:00",
+        "timestamp": 1787585400,
+        "venue": { "id": 562, "name": "St James' Park", "city": "Newcastle upon Tyne" },
+        "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      },
+      "league": { "id": 39, "name": "Premier League", "country": "England", "season": 2026, "round": "Regular Season - 2" },
+      "teams": {
+        "home": { "id": 34, "name": "Newcastle", "winner": null },
+        "away": { "id": 40, "name": "Liverpool", "winner": null }
+      },
+      "goals": { "home": null, "away": null }
+    },
+    {
+      "fixture": {
+        "id": 1400003,
+        "date": "2026-08-29T11:30:00+00:00",
+        "timestamp": 1788089400,
+        "venue": { "id": 550, "name": "Anfield", "city": "Liverpool" },
+        "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      },
+      "league": { "id": 39, "name": "Premier League", "country": "England", "season": 2026, "round": "Regular Season - 3" },
+      "teams": {
+        "home": { "id": 40, "name": "Liverpool", "winner": null },
+        "away": { "id": 65, "name": "Nottingham Forest", "winner": null }
+      },
+      "goals": { "home": null, "away": null }
+    },
+    {
+      "fixture": {
+        "id": 1400004,
+        "date": "2026-09-04T19:00:00+00:00",
+        "timestamp": 1788634800,
+        "venue": { "id": 511, "name": "Portman Road", "city": "Ipswich" },
+        "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      },
+      "league": { "id": 39, "name": "Premier League", "country": "England", "season": 2026, "round": "Regular Season - 4" },
+      "teams": {
+        "home": { "id": 57, "name": "Ipswich", "winner": null },
+        "away": { "id": 40, "name": "Liverpool", "winner": null }
+      },
+      "goals": { "home": null, "away": null }
+    },
+    {
+      "fixture": {
+        "id": 1400005,
+        "date": "2026-09-20T13:00:00+00:00",
+        "timestamp": 1789995600,
+        "venue": { "id": 504, "name": "Vitality Stadium", "city": "Bournemouth" },
+        "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      },
+      "league": { "id": 39, "name": "Premier League", "country": "England", "season": 2026, "round": "Regular Season - 5" },
+      "teams": {
+        "home": { "id": 35, "name": "Bournemouth", "winner": null },
+        "away": { "id": 40, "name": "Liverpool", "winner": null }
+      },
+      "goals": { "home": null, "away": null }
+    },
+    {
+      "fixture": {
+        "id": 1400006,
+        "date": "2026-09-26T14:00:00+00:00",
+        "timestamp": 1790517600,
+        "venue": { "id": 550, "name": "Anfield", "city": "Liverpool" },
+        "status": { "long": "Not Started", "short": "NS", "elapsed": null }
+      },
+      "league": { "id": 39, "name": "Premier League", "country": "England", "season": 2026, "round": "Regular Season - 6" },
+      "teams": {
+        "home": { "id": 40, "name": "Liverpool", "winner": null },
+        "away": { "id": 45, "name": "Everton", "winner": null }
+      },
+      "goals": { "home": null, "away": null }
+    }
+  ]
+}

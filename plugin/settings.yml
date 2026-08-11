@@ -1,0 +1,18 @@
+---
+name: Football Fixtures
+author: njclarke1
+description: >
+  Next fixture for your club across every competition, with opponent crest,
+  kickoff, venue and — optionally — the UK TV channel filtered against the
+  subscriptions you actually hold. On-deck rail shows the following three
+  fixtures. Requires the trmnl-football-api sidecar.
+strategy: polling
+polling_verb: get
+polling_url: "{{ api_base }}/fixtures"
+data_stale_minutes: 15
+custom_fields:
+  - keyname: api_base
+    name: Sidecar API base URL
+    field_type: string
+    description: "e.g. http://192.168.68.111:3458 — the trmnl-football-api container"
+    default: "http://192.168.68.111:3458"
