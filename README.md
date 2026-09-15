@@ -67,3 +67,29 @@ FIXTURES_SOURCE=stub python plugin/demo/render_demo.py  # demo HTML per state
 
 Crests are trademarked assets: they are fetched and cached at runtime only
 and never committed (`cache/` is gitignored).
+
+## Known coverage limitation: domestic cups
+
+`football-data.org`'s catalogue is thirteen league/international competitions
+(`PL, ELC, CL, EC, WC, CLI` plus eight foreign leagues). **FA Cup and the
+League/Carabao Cup are not in it at any tier**, so cup ties never arrive from
+the fixtures API. Verify your own entitlement with:
+
+```bash
+curl -s -H "X-Auth-Token: $FOOTBALL_DATA_TOKEN" \
+  https://api.football-data.org/v4/competitions | jq '[.competitions[].code]'
+```
+
+`app/cupfill.py` works around this by promoting orphan rows from the broadcast
+listings (which do carry cup ties) into synthetic fixtures. It is additive:
+an API fixture is never dropped or overridden, and dedupe is on match date.
+
+**This recovers televised cup ties only.** An untelevised tie is still
+invisible, because absence from the listings means "not on TV", never "no
+fixture". A permanent fix needs a fixtures source that actually carries
+domestic cups.
+
+Controlled by `CUP_FILL_COMPS` (comma-separated competition names as they
+appear on the listings page; empty string disables). Requires
+`ENABLE_BROADCAST=1`. The payload reports how many fixtures were back-filled
+at `sources.cup_fill`.

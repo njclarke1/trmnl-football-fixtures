@@ -3,7 +3,7 @@ Python with zoneinfo — Liquid does presentation only."""
 import datetime as dt
 from zoneinfo import ZoneInfo
 
-from . import config, join
+from . import config, cupfill, join
 from .channels import short_name
 from .shortnames import initials, is_long, rail_name
 
@@ -76,6 +76,12 @@ def build_payload(raw_fixtures: list[dict], listings: list[dict] | None,
     now = now or dt.datetime.now(dt.timezone.utc)
     now_local = now.astimezone(LONDON)
 
+    # Back-fill cup ties the fixtures API doesn't carry (config.CUP_FILL_COMPS).
+    # Additive only — never drops or overrides an API fixture.
+    n_api = len(raw_fixtures)
+    raw_fixtures = cupfill.merge(raw_fixtures, listings)
+    cup_filled = len(raw_fixtures) - n_api
+
     # Hold the current fixture through kickoff + N minutes (plan §12.1) —
     # a blank flip mid-match is worse than a slightly stale card.
     hold = dt.timedelta(minutes=config.HOLD_PAST_KICKOFF_MIN)
@@ -89,6 +95,7 @@ def build_payload(raw_fixtures: list[dict], listings: list[dict] | None,
         "sources": {
             "fixtures": "api-football" if config.FIXTURES_SOURCE == "api" else "stub",
             "broadcast": "uk-listings" if broadcast_enabled else "disabled",
+            "cup_fill": cup_filled,
         },
         "stale": stale,
         "team": config.TEAM_NAME,

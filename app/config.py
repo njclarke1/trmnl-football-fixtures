@@ -26,6 +26,21 @@ LISTINGS_URL = os.environ.get(
 CONTACT = os.environ.get("CONTACT", "")
 USER_AGENT = f"trmnl-football-fixtures/1.0 (personal e-ink display{'; ' + CONTACT if CONTACT else ''})"
 
+# --- cup back-fill ---------------------------------------------------------
+# football-data.org carries no domestic cups at any tier, so cup ties never
+# arrive from the fixtures API. Promote orphan broadcast-listing rows in these
+# competitions into fixtures (app/cupfill.py). Requires ENABLE_BROADCAST.
+# Only *televised* ties are recoverable this way — see cupfill.py docstring.
+CUP_FILL_COMPS = [
+    c.strip()
+    for c in os.environ.get(
+        "CUP_FILL_COMPS",
+        "League Cup,Carabao Cup,EFL Cup,FA Cup,"
+        "Community Shield,FA Community Shield,UEFA Super Cup",
+    ).split(",")
+    if c.strip()
+]
+
 # --- owned channels --------------------------------------------------------
 OWNED_CHANNELS = [
     c.strip().lower()

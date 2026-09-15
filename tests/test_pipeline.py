@@ -140,3 +140,47 @@ def test_empty_state():
 def test_broadcast_disabled_falls_to_tbc():
     p = normalise.build_payload(_fixtures(), None, now=NOW, broadcast_enabled=False)
     assert p["on_deck"][0]["channel_short"] == "TBC"
+
+
+# --- cup back-fill (football-data.org carries no domestic cups) -------------
+
+def _cup_row(date, time="19:45", comp="League Cup",
+             home="Liverpool", away="Grimsby Town",
+             channels=("Sky Sports Main Event",)):
+    return {"date": date, "time": time, "home": home, "away": away,
+            "competition": comp, "channels": list(channels)}
+
+
+def test_cupfill_promotes_orphan_cup_tie():
+    """A televised cup tie absent from the fixtures API must appear, with
+    its broadcast data joined in the normal way."""
+    listings = _listings() + [_cup_row(dt.date(2026, 8, 12))]
+    p = normalise.build_payload(_fixtures(), listings, now=NOW)
+    assert p["sources"]["cup_fill"] == 1
+    nxt = p["next"]
+    assert nxt["competition"] == "Carabao Cup"        # COMP_DISPLAY maps it
+    assert nxt["away"]["name"] == "Grimsby Town"
+    assert nxt["home"]["crest"] is not None           # our side resolves
+    assert nxt["away"]["crest"] is None               # opponent → initials
+    assert nxt["broadcast"]["state"] == "available"
+    assert nxt["broadcast"]["owned"] is True
+
+
+def test_cupfill_never_duplicates_an_api_fixture():
+    """Same-date dedupe: an API fixture always wins, even if the listings
+    row disagrees on kickoff time."""
+    api = _fixtures()
+    first = min(dt.datetime.fromisoformat(f["fixture"]["date"]) for f in api)
+    clash = _cup_row(first.date(), time="23:59", comp="FA Cup")
+    p = normalise.build_payload(api, _listings() + [clash], now=NOW)
+    assert p["sources"]["cup_fill"] == 0
+
+
+def test_cupfill_ignores_non_cup_and_other_squads():
+    listings = [
+        _cup_row(dt.date(2026, 8, 12), comp="Premier League"),
+        _cup_row(dt.date(2026, 8, 13), home="Liverpool Women",
+                 away="Arsenal Women"),
+    ]
+    p = normalise.build_payload(_fixtures(), listings, now=NOW)
+    assert p["sources"]["cup_fill"] == 0
