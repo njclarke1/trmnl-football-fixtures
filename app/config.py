@@ -41,6 +41,17 @@ CUP_FILL_COMPS = [
     if c.strip()
 ]
 
+# --- ESPN cup source --------------------------------------------------------
+# Primary cup source (app/sources/espn_cups.py). Keyless public API; carries
+# untelevised ties too. The listings back-fill above remains the fallback.
+ENABLE_ESPN_CUPS = _bool("ENABLE_ESPN_CUPS", "1")
+ESPN_TEAM_ID = os.environ.get("ESPN_TEAM_ID", "364")        # Liverpool on ESPN
+ESPN_CUP_LEAGUES = [
+    s.strip()
+    for s in os.environ.get("ESPN_CUP_LEAGUES", "eng.league_cup,eng.fa").split(",")
+    if s.strip()
+]
+
 # --- owned channels --------------------------------------------------------
 OWNED_CHANNELS = [
     c.strip().lower()

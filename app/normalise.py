@@ -62,7 +62,9 @@ def _team(obj: dict) -> dict:
 
 
 def _kickoff_utc(fx: dict) -> dt.datetime:
-    return dt.datetime.fromisoformat(fx["fixture"]["date"]).astimezone(dt.timezone.utc)
+    # .replace: ESPN emits "2026-09-15T19:00Z"; tolerate "Z" on any Python.
+    return dt.datetime.fromisoformat(
+        fx["fixture"]["date"].replace("Z", "+00:00")).astimezone(dt.timezone.utc)
 
 
 def _tbc(fx: dict) -> bool:
@@ -72,15 +74,15 @@ def _tbc(fx: dict) -> bool:
 
 def build_payload(raw_fixtures: list[dict], listings: list[dict] | None,
                   now: dt.datetime | None = None, stale: bool = False,
-                  broadcast_enabled: bool = True) -> dict:
+                  broadcast_enabled: bool = True,
+                  cup_fixtures: list[dict] | None = None) -> dict:
     now = now or dt.datetime.now(dt.timezone.utc)
     now_local = now.astimezone(LONDON)
 
     # Back-fill cup ties the fixtures API doesn't carry (config.CUP_FILL_COMPS).
     # Additive only — never drops or overrides an API fixture.
-    n_api = len(raw_fixtures)
-    raw_fixtures = cupfill.merge(raw_fixtures, listings)
-    cup_filled = len(raw_fixtures) - n_api
+    raw_fixtures, cup_counts = cupfill.merge(raw_fixtures, listings, cup_fixtures)
+    cup_filled = cup_counts["espn"] + cup_counts["listings"]
 
     # Hold the current fixture through kickoff + N minutes (plan §12.1) —
     # a blank flip mid-match is worse than a slightly stale card.
@@ -96,6 +98,7 @@ def build_payload(raw_fixtures: list[dict], listings: list[dict] | None,
             "fixtures": "api-football" if config.FIXTURES_SOURCE == "api" else "stub",
             "broadcast": "uk-listings" if broadcast_enabled else "disabled",
             "cup_fill": cup_filled,
+            "cup_fill_by": cup_counts,
         },
         "stale": stale,
         "team": config.TEAM_NAME,

@@ -13,7 +13,7 @@ import time
 from flask import Flask, abort, jsonify, send_file
 
 from . import config, crests, normalise
-from .sources import football_data
+from .sources import espn_cups, football_data
 
 try:
     from .sources import broadcast_html
@@ -29,7 +29,7 @@ app = Flask(__name__)
 LAST_GOOD_FILE = os.path.join(config.CACHE_DIR, "last_good.json")
 _lock = threading.Lock()
 _state = {"fetched_at": 0.0, "raw_fixtures": None, "listings": None,
-          "listings_ok": False}
+          "listings_ok": False, "cups": [], "cups_ok": False}
 
 
 def _load_last_good():
@@ -70,6 +70,16 @@ def _refresh_if_due() -> bool:
             # Back off 10 min before retrying upstream, never a tight loop.
             _state["fetched_at"] = time.time() - config.CACHE_TTL + 600
 
+        # Cup fixtures (ESPN). Fail soft: keep the last good list on error.
+        if config.ENABLE_ESPN_CUPS:
+            try:
+                _state["cups"] = espn_cups.fetch_cup_fixtures()
+                _state["cups_ok"] = True
+            except Exception as exc:  # noqa: BLE001
+                log.error("espn cup fetch failed (keeping last good, %d): %s",
+                          len(_state["cups"]), exc)
+                _state["cups_ok"] = False
+
         _state["listings"] = None
         _state["listings_ok"] = False
         if config.ENABLE_BROADCAST and broadcast_html is not None:
@@ -94,6 +104,7 @@ def fixtures():
         raw, _state["listings"],
         stale=stale or (time.time() - _state["fetched_at"] > config.CACHE_TTL * 2),
         broadcast_enabled=config.ENABLE_BROADCAST and _state["listings_ok"],
+        cup_fixtures=_state["cups"],
     )
     return jsonify(payload)
 
@@ -114,6 +125,8 @@ def healthz():
         "cache_age_s": int(time.time() - _state["fetched_at"]) if _state["fetched_at"] else None,
         "broadcast_enabled": config.ENABLE_BROADCAST,
         "listings_ok": _state["listings_ok"],
+        "espn_cups_ok": _state["cups_ok"],
+        "espn_cups_cached": len(_state["cups"]),
         "source": config.FIXTURES_SOURCE,
     })
 

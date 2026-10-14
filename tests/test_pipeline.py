@@ -184,3 +184,58 @@ def test_cupfill_ignores_non_cup_and_other_squads():
     ]
     p = normalise.build_payload(_fixtures(), listings, now=NOW)
     assert p["sources"]["cup_fill"] == 0
+
+
+# --- ESPN cup source ---------------------------------------------------------
+
+from app import cupfill  # noqa: E402
+from app.sources import espn_cups  # noqa: E402
+
+
+def test_espn_translate_skips_completed_and_maps_sides():
+    cups = espn_cups.fetch_cup_fixtures()           # stub mode
+    assert len(cups) == 1                            # completed Spurs tie dropped
+    fx = cups[0]
+    assert fx["league"]["name"] == "League Cup"
+    assert fx["league"]["round"] == "Third Round"
+    assert fx["fixture"]["venue"]["name"] == "Anfield"
+    assert fx["fixture"]["id"] < 0
+    assert fx["teams"]["home"]["id"] == 64           # our FD id → crest resolves
+    assert fx["teams"]["away"]["id"] is None         # opponent → initials
+
+
+def test_espn_cup_tie_reaches_display_with_broadcast():
+    """Untelevised-safe path: the tie comes from ESPN; channels join from
+    listings by date+time exactly as for a league fixture."""
+    cups = espn_cups.fetch_cup_fixtures()
+    listings = _listings() + [_cup_row(dt.date(2026, 8, 12), time="19:45")]
+    p = normalise.build_payload(_fixtures(), listings, now=NOW,
+                                cup_fixtures=cups)
+    assert p["sources"]["cup_fill_by"] == {"espn": 1, "listings": 0}
+    nxt = p["next"]
+    assert nxt["competition"] == "Carabao Cup"
+    assert nxt["round"] == "Third Round"
+    assert nxt["venue"] == "Anfield"                 # ESPN supplies venue
+    assert nxt["broadcast"]["state"] == "available"
+
+
+def test_espn_cup_tie_without_tv_listing_still_shows():
+    cups = espn_cups.fetch_cup_fixtures()
+    p = normalise.build_payload(_fixtures(), _listings(), now=NOW,
+                                cup_fixtures=cups)
+    assert p["next"]["competition"] == "Carabao Cup"
+    assert p["next"]["broadcast"]["state"] == "tbc"
+
+
+def test_listings_fallback_when_espn_empty():
+    listings = _listings() + [_cup_row(dt.date(2026, 8, 12))]
+    p = normalise.build_payload(_fixtures(), listings, now=NOW, cup_fixtures=[])
+    assert p["sources"]["cup_fill_by"] == {"espn": 0, "listings": 1}
+
+
+def test_listings_synthetic_id_negative_and_stable():
+    row = _cup_row(dt.date(2026, 8, 12))
+    a = cupfill._synth(row, dt.datetime(2026, 8, 12, 18, 45, tzinfo=dt.timezone.utc))
+    b = cupfill._synth(row, dt.datetime(2026, 8, 12, 18, 45, tzinfo=dt.timezone.utc))
+    assert a["fixture"]["id"] < 0
+    assert a["fixture"]["id"] == b["fixture"]["id"]

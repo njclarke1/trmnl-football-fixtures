@@ -80,16 +80,25 @@ curl -s -H "X-Auth-Token: $FOOTBALL_DATA_TOKEN" \
   https://api.football-data.org/v4/competitions | jq '[.competitions[].code]'
 ```
 
-`app/cupfill.py` works around this by promoting orphan rows from the broadcast
-listings (which do carry cup ties) into synthetic fixtures. It is additive:
-an API fixture is never dropped or overridden, and dedupe is on match date.
+Cup fixtures come from two layers, merged by `app/cupfill.py` and deduped on
+match date (an API fixture is never dropped or overridden):
 
-**This recovers televised cup ties only.** An untelevised tie is still
-invisible, because absence from the listings means "not on TV", never "no
-fixture". A permanent fix needs a fixtures source that actually carries
-domestic cups.
+1. **ESPN public site API** (`app/sources/espn_cups.py`) — keyless, carries
+   untelevised ties, venue and round. Leagues set by `ESPN_CUP_LEAGUES`
+   (default `eng.league_cup,eng.fa`); team by `ESPN_TEAM_ID` (Liverpool = 364).
+   Unofficial and undocumented, so it is a gap-filler only: on failure the
+   last good result is kept.
+2. **Broadcast listings fallback** — orphan cup rows from the listings page
+   (`CUP_FILL_COMPS`). Televised ties only. Used when ESPN has nothing for
+   that date.
 
-Controlled by `CUP_FILL_COMPS` (comma-separated competition names as they
-appear on the listings page; empty string disables). Requires
-`ENABLE_BROADCAST=1`. The payload reports how many fixtures were back-filled
-at `sources.cup_fill`.
+Where-to-watch data joins onto cup ties exactly as for league fixtures.
+`sources.cup_fill_by` in the payload shows which layer supplied each tie;
+`/healthz` reports `espn_cups_ok`.
+
+## Deployment note
+
+`docker-compose.yml` sets `pull_policy: build`. Portainer git stacks discard
+`.git` and, without this, reuse the existing local `trmnl-football-api:latest`
+image on redeploy — so new code never reaches the container. Always redeploy
+from the Portainer UI (Pull and redeploy), never by hand in `/data/compose/<id>`.

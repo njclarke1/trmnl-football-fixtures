@@ -3,6 +3,9 @@ services:
   trmnl-football-api:
     build: .
     image: trmnl-football-api:latest
+    # Rebuild from the fresh clone on every `up`. Without this, a Portainer
+    # git redeploy finds the existing local tag and reuses the OLD image.
+    pull_policy: build
     container_name: trmnl-football-api
     restart: unless-stopped
     ports:
@@ -16,5 +19,7 @@ services:
       CONTACT: ${CONTACT:-}
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://192.168.68.111:3458}
       FIXTURES_SOURCE: ${FIXTURES_SOURCE:-api}
+      ENABLE_ESPN_CUPS: ${ENABLE_ESPN_CUPS:-1}
+      ESPN_TEAM_ID: ${ESPN_TEAM_ID:-364}
     volumes:
       - ./cache:/app/cache

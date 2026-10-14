@@ -1,0 +1,94 @@
+{
+ "team": {
+  "id": "364",
+  "displayName": "Liverpool"
+ },
+ "events": [
+  {
+   "id": "700001",
+   "date": "2026-09-15T19:00Z",
+   "name": "Tottenham Hotspur at Liverpool",
+   "competitions": [
+    {
+     "timeValid": true,
+     "venue": {
+      "fullName": "Anfield",
+      "address": {
+       "city": "Liverpool"
+      }
+     },
+     "notes": [],
+     "status": {
+      "type": {
+       "name": "STATUS_FULL_TIME",
+       "completed": true
+      }
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "364",
+        "displayName": "Liverpool",
+        "shortDisplayName": "Liverpool"
+       }
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "367",
+        "displayName": "Tottenham Hotspur",
+        "shortDisplayName": "Tottenham Hotspur"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "700002",
+   "date": "2026-08-12T18:45Z",
+   "name": "Grimsby Town at Liverpool",
+   "competitions": [
+    {
+     "timeValid": true,
+     "venue": {
+      "fullName": "Anfield",
+      "address": {
+       "city": "Liverpool"
+      }
+     },
+     "notes": [
+      {
+       "headline": "Third Round"
+      }
+     ],
+     "status": {
+      "type": {
+       "name": "STATUS_SCHEDULED",
+       "completed": false
+      }
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "364",
+        "displayName": "Liverpool",
+        "shortDisplayName": "Liverpool"
+       }
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "9999",
+        "displayName": "Grimsby Town",
+        "shortDisplayName": "Grimsby Town"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

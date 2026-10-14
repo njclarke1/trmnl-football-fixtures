@@ -1,4 +1,4 @@
-"""Cup fixture back-fill from the broadcast listings.
+"""Cup fixture back-fill: ESPN first, broadcast listings as fallback.
 
 Why this exists
 ---------------
@@ -30,6 +30,7 @@ Synthetic fixtures carry:
 """
 import datetime as dt
 import logging
+import zlib
 from zoneinfo import ZoneInfo
 
 from . import config
@@ -71,10 +72,10 @@ def _synth(row: dict, kick_utc: dt.datetime) -> dict | None:
         return {"id": config.TEAM_ID if ours else None, "name": name,
                 "winner": None}
 
-    # Stable negative id derived from the natural key, so repeated refreshes
-    # of the same tie produce the same id.
-    fid = -abs(hash((row["date"].isoformat(), row["time"], row["home"],
-                     row["away"]))) % (10 ** 9) - 1
+    # Stable negative id derived from the natural key. crc32 rather than
+    # hash(): hash() is salted per process, so ids changed on every restart.
+    key = "|".join((row["date"].isoformat(), row["time"], row["home"], row["away"]))
+    fid = -(zlib.crc32(key.encode()) % (10 ** 9)) - 1
 
     return {
         "fixture": {
@@ -100,45 +101,57 @@ def _synth(row: dict, kick_utc: dt.datetime) -> dict | None:
     }
 
 
-def merge(raw_fixtures: list[dict], listings: list[dict] | None) -> list[dict]:
-    """Return raw_fixtures plus synthetic fixtures for orphan listing rows.
+def _local_date(fx: dict) -> dt.date | None:
+    try:
+        k = dt.datetime.fromisoformat(fx["fixture"]["date"].replace("Z", "+00:00"))
+    except (KeyError, ValueError, AttributeError):
+        return None
+    return k.astimezone(LONDON).date()
 
-    Never mutates or drops an API fixture. Dedupe is on local match DATE:
-    a side does not play twice in a day, and date is the one field both
-    sources agree on even when a kickoff time has been moved.
+
+def merge(raw_fixtures: list[dict], listings: list[dict] | None,
+          cup_fixtures: list[dict] | None = None) -> tuple[list[dict], dict]:
+    """Return (fixtures, counts).
+
+    Order of precedence, deduped on local match DATE (a side doesn't play
+    twice in a day, and date is the field every source agrees on even when
+    a kickoff time moves):
+
+      1. API fixtures (football-data.org) — never dropped or overridden
+      2. ESPN cup fixtures — carry untelevised ties, venue and round
+      3. Orphan cup rows from the broadcast listings — fallback only
     """
-    if not listings or not config.CUP_FILL_COMPS:
-        return raw_fixtures
-
-    known_dates: set[dt.date] = set()
-    for fx in raw_fixtures:
-        try:
-            k = dt.datetime.fromisoformat(fx["fixture"]["date"])
-        except (KeyError, ValueError):
-            continue
-        known_dates.add(k.astimezone(LONDON).date())
-
-    wanted = {c.casefold() for c in config.CUP_FILL_COMPS}
+    known_dates: set[dt.date] = {d for d in map(_local_date, raw_fixtures) if d}
+    counts = {"espn": 0, "listings": 0}
     added: list[dict] = []
 
-    for row in listings:
-        comp = (row.get("competition") or "").casefold()
-        if comp not in wanted:
-            continue
-        if row["date"] in known_dates:
-            continue
-        kick = _kick_utc(row)
-        if kick is None:
-            continue
-        fx = _synth(row, kick)
-        if fx is None:
+    for fx in cup_fixtures or []:
+        d = _local_date(fx)
+        if d is None or d in known_dates:
             continue
         added.append(fx)
-        known_dates.add(row["date"])
+        known_dates.add(d)
+        counts["espn"] += 1
+
+    if listings and config.CUP_FILL_COMPS:
+        wanted = {c.casefold() for c in config.CUP_FILL_COMPS}
+        for row in listings:
+            if (row.get("competition") or "").casefold() not in wanted:
+                continue
+            if row["date"] in known_dates:
+                continue
+            kick = _kick_utc(row)
+            if kick is None:
+                continue
+            fx = _synth(row, kick)
+            if fx is None:
+                continue
+            added.append(fx)
+            known_dates.add(row["date"])
+            counts["listings"] += 1
 
     if added:
-        log.info("cup-fill added %d fixture(s) absent from the fixtures API: %s",
-                 len(added),
+        log.info("cup-fill added %s: %s", counts,
                  ", ".join(f'{f["league"]["name"]} {f["fixture"]["date"][:10]}'
                            for f in added))
-    return raw_fixtures + added
+    return raw_fixtures + added, counts
