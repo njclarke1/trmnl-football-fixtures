@@ -239,3 +239,8 @@ def test_listings_synthetic_id_negative_and_stable():
     b = cupfill._synth(row, dt.datetime(2026, 8, 12, 18, 45, tzinfo=dt.timezone.utc))
     assert a["fixture"]["id"] < 0
     assert a["fixture"]["id"] == b["fixture"]["id"]
+
+
+def test_espn_user_agent_carries_no_contact():
+    from app import config
+    assert "@" not in config.ESPN_USER_AGENT

@@ -106,7 +106,7 @@ def _fetch_league(slug: str) -> list[dict]:
         r = requests.get(
             f"{BASE}/{slug}/teams/{config.ESPN_TEAM_ID}/schedule",
             params={"fixture": "true"},
-            headers={"User-Agent": config.USER_AGENT},
+            headers={"User-Agent": config.ESPN_USER_AGENT},
             timeout=15,
         )
         r.raise_for_status()

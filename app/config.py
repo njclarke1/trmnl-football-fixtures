@@ -25,6 +25,9 @@ LISTINGS_URL = os.environ.get(
 )
 CONTACT = os.environ.get("CONTACT", "")
 USER_AGENT = f"trmnl-football-fixtures/1.0 (personal e-ink display{'; ' + CONTACT if CONTACT else ''})"
+# ESPN's edge returns 403 to a User-Agent containing an email address
+# (verified 2026-10-14), and the contact is meant for the listings site only.
+ESPN_USER_AGENT = "trmnl-football-fixtures/1.0 (personal e-ink display)"
 
 # --- cup back-fill ---------------------------------------------------------
 # football-data.org carries no domestic cups at any tier, so cup ties never
